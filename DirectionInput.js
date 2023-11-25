@@ -8,9 +8,9 @@ class DirectionInput {
       ArrowDown: 'down',
       KeyS: 'down',
       ArrowLeft: 'left',
-      KeyD: 'left',
+      KeyA: 'left',
       ArrowRight: 'right',
-      KeyA: 'right',
+      KeyD: 'right',
     };
   }
 
