@@ -14,31 +14,52 @@ class Person extends GameObject {
   }
 
   update(state) {
-    this.updatePosition();
-    this.updateSprite(state);
+    if (this.movingProgressRemaining > 0) {
+      this.updatePosition();
+    } else {
+      // More cases for starting to walk will come here
+      //
+      //
 
-    if (this.isPlayerControlled && this.movingProgressRemaining === 0 && state.arrow) {
-      this.direction = state.arrow;
+      // Case: we're keyboard ready and have an arrow press
+      if (this.isPlayerControlled && state.arrow) {
+        this.startBehavior(state, {
+          type: 'walk',
+          direction: state.arrow,
+        });
+      }
+      this.updateSprite();
+    }
+  }
+
+  startBehavior(state, behavior) {
+    // Set character direction to whatever behavior has
+    this.direction = behavior.direction;
+
+    if (behavior.type === 'walk') {
+      // Stop here if space is not free
+      if (state.map.isSpaceTaken(this.x, this.y, this.direction)) {
+        return;
+      }
+
+      // Ready to walk
+      state.map.moveWall(this.x, this.y, this.direction);
       this.movingProgressRemaining = 16;
     }
   }
 
   updatePosition() {
-    if (this.movingProgressRemaining > 0) {
-      const [property, change] = this.directionUpdate[this.direction];
-      this[property] += change;
-      this.movingProgressRemaining -= 1;
-    }
+    const [property, change] = this.directionUpdate[this.direction];
+    this[property] += change;
+    this.movingProgressRemaining -= 1;
   }
 
-  updateSprite(state) {
-    if (this.isPlayerControlled && this.movingProgressRemaining === 0 && !state.arrow) {
-      this.sprite.setAnimation('idle-' + this.direction);
+  updateSprite() {
+    if (this.movingProgressRemaining > 0) {
+      this.sprite.setAnimation('walk-' + this.direction);
       return;
     }
 
-    if (this.movingProgressRemaining > 0) {
-      this.sprite.setAnimation('walk-' + this.direction);
-    }
+    this.sprite.setAnimation('idle-' + this.direction);
   }
 }
