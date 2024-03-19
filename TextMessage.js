@@ -22,7 +22,7 @@ class TextMessage {
     });
 
     this.element.querySelector('button').addEventListener('click', () => {
-      // CLose the text message
+      // Close the text message
       this.done();
     });
 

@@ -4,13 +4,15 @@ class KeyPressListener {
 
     this.keydownFunction = function (event) {
       if (event.code === keyCode) {
-        keySafe = false;
-        callback();
+        if (keySafe) {
+          keySafe = false;
+          callback();
+        }
       }
     };
 
     this.keyupFunction = function (event) {
-      if (event.keyCode === keyCode) {
+      if (event.code === keyCode) {
         keySafe = true;
       }
     };
