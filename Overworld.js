@@ -8,7 +8,7 @@ class Overworld {
 
   startGameLoop() {
     const step = () => {
-      // Clear the canvas
+      // Clear off the canvas
       this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
       // Establish the camera person (main hero in our case)

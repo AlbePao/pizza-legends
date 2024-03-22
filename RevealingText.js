@@ -2,19 +2,19 @@ class RevealingText {
   constructor(config) {
     this.element = config.element;
     this.text = config.text;
-    this.speed = config.speed || 70;
+    this.speed = config.speed || 60;
 
     this.timeout = null;
     this.isDone = false;
   }
 
-  revealCharacter(list) {
+  revealOneCharacter(list) {
     const next = list.splice(0, 1)[0];
     next.span.classList.add('revealed');
 
     if (list.length > 0) {
       this.timeout = setTimeout(() => {
-        this.revealCharacter(list);
+        this.revealOneCharacter(list);
       }, next.delayAfter);
     } else {
       this.isDone = true;
@@ -44,6 +44,6 @@ class RevealingText {
       });
     });
 
-    this.revealCharacter(characters);
+    this.revealOneCharacter(characters);
   }
 }
