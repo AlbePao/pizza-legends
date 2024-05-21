@@ -12,14 +12,7 @@ window.Actions = {
     targetType: 'friendly',
     success: [
       { type: 'textMessage', text: '{CASTER} uses {ACTION}!' },
-      {
-        type: 'stateChange',
-        onCaster: true,
-        status: {
-          type: 'saucy',
-          expiresIn: 3,
-        },
-      },
+      { type: 'stateChange', status: { type: 'saucy', expiresIn: 3 } },
     ],
   },
   clumsyStatus: {
@@ -29,6 +22,26 @@ window.Actions = {
       { type: 'animation', animation: 'glob', color: '#dafd2a' },
       { type: 'stateChange', status: { type: 'clumsy', expiresIn: 3 } },
       { type: 'textMessage', text: '{TARGET} is slipping all around!' },
+    ],
+  },
+  // Items
+  item_RecoverStatus: {
+    name: 'Heating Lamp',
+    description: 'Feeling fresh and warm',
+    targetType: 'friendly',
+    success: [
+      { type: 'textMessage', text: '{CASTER} uses a {ACTION}!' },
+      { type: 'stateChange', status: null },
+      { type: 'textMessage', text: 'Feeling fresh!' },
+    ],
+  },
+  item_RecoverHp: {
+    name: 'Parmesan',
+    targetType: 'friendly',
+    success: [
+      { type: 'textMessage', text: '{CASTER} sprinkles on some {ACTION}!' },
+      { type: 'stateChange', recover: 10 },
+      { type: 'textMessage', text: '{CASTER} recovers HP!' },
     ],
   },
 };

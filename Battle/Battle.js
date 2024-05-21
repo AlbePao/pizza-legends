@@ -10,7 +10,7 @@ class Battle {
           xp: 75,
           maxXp: 100,
           level: 1,
-          status: null,
+          status: { type: 'saucy' },
           isPlayerControlled: true,
         },
         this,
@@ -45,6 +45,13 @@ class Battle {
       player: 'player1',
       enemy: 'enemy1',
     };
+
+    this.items = [
+      { actionId: 'item_RecoverStatus', instanceId: 'p1', team: 'player' },
+      { actionId: 'item_RecoverStatus', instanceId: 'p2', team: 'player' },
+      { actionId: 'item_RecoverStatus', instanceId: 'p3', team: 'enemy' },
+      { actionId: 'item_RecoverHp', instanceId: 'p4', team: 'player' },
+    ];
   }
 
   createElement() {
