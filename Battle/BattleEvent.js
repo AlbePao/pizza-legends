@@ -37,7 +37,7 @@ class BattleEvent {
     if (recover) {
       let newHp = who.hp + recover;
 
-      if (newHp > who.hp) {
+      if (newHp > who.maxHp) {
         newHp = who.maxHp;
       }
 
@@ -70,7 +70,7 @@ class BattleEvent {
   submissionMenu(resolve) {
     const { caster } = this.event;
     const menu = new SubmissionMenu({
-      caster: this.event.caster,
+      caster: caster,
       enemy: this.event.enemy,
       items: this.battle.items,
       replacements: Object.values(this.battle.combatants).filter((c) => {
