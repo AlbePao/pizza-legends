@@ -1,71 +1,102 @@
 class Battle {
-  constructor() {
+  constructor({ enemy, onComplete }) {
+    this.enemy = enemy;
+    this.onComplete = onComplete;
+
     this.combatants = {
-      player1: new Combatant(
-        {
-          ...Pizzas.s001,
-          team: 'player',
-          hp: 30,
-          maxHp: 50,
-          xp: 75,
-          maxXp: 100,
-          level: 1,
-          status: { type: 'saucy' },
-          isPlayerControlled: true,
-        },
-        this,
-      ),
-      player2: new Combatant(
-        {
-          ...Pizzas.s002,
-          team: 'player',
-          hp: 30,
-          maxHp: 50,
-          xp: 75,
-          maxXp: 100,
-          level: 1,
-          status: null,
-          isPlayerControlled: true,
-        },
-        this,
-      ),
-      enemy1: new Combatant(
-        {
-          ...Pizzas.v001,
-          team: 'enemy',
-          hp: 1,
-          maxHp: 50,
-          xp: 20,
-          maxXp: 100,
-          level: 1,
-        },
-        this,
-      ),
-      enemy2: new Combatant(
-        {
-          ...Pizzas.f001,
-          team: 'enemy',
-          hp: 25,
-          maxHp: 50,
-          xp: 30,
-          maxXp: 100,
-          level: 1,
-        },
-        this,
-      ),
+      // player1: new Combatant(
+      //   {
+      //     ...Pizzas.s001,
+      //     team: 'player',
+      //     hp: 30,
+      //     maxHp: 50,
+      //     xp: 95,
+      //     maxXp: 100,
+      //     level: 1,
+      //     status: { type: 'saucy' },
+      //     isPlayerControlled: true,
+      //   },
+      //   this,
+      // ),
+      // player2: new Combatant(
+      //   {
+      //     ...Pizzas.s002,
+      //     team: 'player',
+      //     hp: 30,
+      //     maxHp: 50,
+      //     xp: 75,
+      //     maxXp: 100,
+      //     level: 1,
+      //     status: null,
+      //     isPlayerControlled: true,
+      //   },
+      //   this,
+      // ),
+      // enemy1: new Combatant(
+      //   {
+      //     ...Pizzas.v001,
+      //     team: 'enemy',
+      //     hp: 1,
+      //     maxHp: 50,
+      //     xp: 20,
+      //     maxXp: 100,
+      //     level: 1,
+      //   },
+      //   this,
+      // ),
+      // enemy2: new Combatant(
+      //   {
+      //     ...Pizzas.f001,
+      //     team: 'enemy',
+      //     hp: 25,
+      //     maxHp: 50,
+      //     xp: 30,
+      //     maxXp: 100,
+      //     level: 1,
+      //   },
+      //   this,
+      // ),
     };
 
     this.activeCombatants = {
-      player: 'player1',
-      enemy: 'enemy1',
+      player: null, // 'player1',
+      enemy: null, // 'enemy1',
     };
 
-    this.items = [
-      { actionId: 'item_RecoverStatus', instanceId: 'p1', team: 'player' },
-      { actionId: 'item_RecoverStatus', instanceId: 'p2', team: 'player' },
-      { actionId: 'item_RecoverStatus', instanceId: 'p3', team: 'enemy' },
-      { actionId: 'item_RecoverHp', instanceId: 'p4', team: 'player' },
-    ];
+    // Dynamically add the Player team
+    window.playerState.lineup.forEach((id) => {
+      this.addCombatant(id, 'player', window.playerState.pizzas[id]);
+    });
+
+    // Now the Enemy team
+    Object.keys(this.enemy.pizzas).forEach((key) => {
+      this.addCombatant(`e_${key}`, 'enemy', this.enemy.pizzas[key]);
+    });
+
+    // Start empty
+    this.items = [];
+
+    // Add in player items
+    window.playerState.items.forEach((item) => {
+      this.items.push({ ...item, team: 'player' });
+    });
+
+    this.usedInstanceIds = {};
+  }
+
+  addCombatant(id, team, config) {
+    this.combatants[id] = new Combatant(
+      {
+        ...Pizzas[config.pizzaId],
+        ...config,
+        team,
+        isPlayerControlled: team === 'player',
+      },
+      this,
+    );
+
+    // Populate first active pizza
+    this.activeCombatants[team] = this.activeCombatants[team] || id;
   }
 
   createElement() {
@@ -76,7 +107,7 @@ class Battle {
       <img src="${'/images/characters/people/hero.png'}" alt="Hero" />
     </div>
     <div class="Battle_enemy">
-      <img src="${'/images/characters/people/npc3.png'}" alt="Enemy" />
+      <img src="${this.enemy.src}" alt="${this.enemy.name}" />
     </div>
     `;
   }
@@ -111,6 +142,30 @@ class Battle {
           const battleEvent = new BattleEvent(event, this);
           battleEvent.init(resolve);
         });
+      },
+      onWinner: (winner) => {
+        if (winner === 'player') {
+          const playerState = window.playerState;
+          Object.keys(playerState.pizzas).forEach((id) => {
+            const playerStatePizza = playerState.pizzas[id];
+            const combatant = this.combatants[id];
+
+            if (combatant) {
+              playerStatePizza.hp = combatant.hp;
+              playerStatePizza.xp = combatant.xp;
+              playerStatePizza.maxXp = combatant.maxXp;
+              playerStatePizza.level = combatant.level;
+            }
+          });
+
+          // Get rid of player used items
+          playerState.items = playerState.items.filter((item) => {
+            return !this.usedInstanceIds[item.instanceId];
+          });
+        }
+
+        this.element.remove();
+        this.onComplete();
       },
     });
 
